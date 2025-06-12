@@ -176,6 +176,7 @@ llm:
 database:
   population_size: 500
   num_islands: 5
+  island_inspiration_ratio: 0.0
 ```
 
 Sample configuration files are available in the `configs/` directory:

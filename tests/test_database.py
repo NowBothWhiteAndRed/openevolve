@@ -80,6 +80,28 @@ class TestProgramDatabase(unittest.TestCase):
         self.assertIsNotNone(parent)
         self.assertIn(parent.id, ["test1", "test2"])
 
+    def test_island_inspiration_ratio(self):
+        """Inspirations can be forced to come from the current island"""
+        config = Config()
+        config.database.in_memory = True
+        config.database.num_islands = 2
+        config.database.exploration_ratio = 1.0
+        config.database.island_inspiration_ratio = 1.0
+        db = ProgramDatabase(config.database)
+
+        p1 = Program(id="p1", code="a", metrics={"score": 0.1})
+        p2 = Program(id="p2", code="b", metrics={"score": 0.2})
+        db.add(p1, target_island=0)
+        db.add(p2, target_island=0)
+
+        p3 = Program(id="p3", code="c", metrics={"score": 0.3})
+        db.add(p3, target_island=1)
+
+        db.set_current_island(0)
+        parent, inspirations = db.sample()
+
+        self.assertTrue(all(prog.metadata.get("island") == 0 for prog in inspirations))
+
 
 if __name__ == "__main__":
     unittest.main()

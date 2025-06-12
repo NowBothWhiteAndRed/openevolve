@@ -161,6 +161,9 @@ class DatabaseConfig:
     migration_interval: int = 50  # Migrate every N generations
     migration_rate: float = 0.1  # Fraction of population to migrate
 
+    # Inspiration sampling
+    island_inspiration_ratio: float = 0.0  # Fraction of inspirations from the current island
+
     # Random seed for reproducible sampling
     random_seed: Optional[int] = None
 
@@ -307,6 +310,7 @@ class Config:
                 "feature_bins": self.database.feature_bins,
                 "migration_interval": self.database.migration_interval,
                 "migration_rate": self.database.migration_rate,
+                "island_inspiration_ratio": self.database.island_inspiration_ratio,
                 "random_seed": self.database.random_seed,
             },
             "evaluator": {
