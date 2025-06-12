@@ -162,7 +162,10 @@ class DatabaseConfig:
     migration_rate: float = 0.1  # Fraction of population to migrate
 
     # Inspiration sampling
-    island_inspiration_ratio: float = 0.0  # Fraction of inspirations from the current island
+    island_inspiration_ratio: float = (
+        0.0  # Fraction of inspirations from the current island (1.0 = island only)
+    )
+
 
     # Random seed for reproducible sampling
     random_seed: Optional[int] = None

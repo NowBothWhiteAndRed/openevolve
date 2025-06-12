@@ -82,7 +82,8 @@ database:
   # Migration periodically shares the best solutions between adjacent islands.
   migration_interval: 50              # Migrate between islands every N generations
   migration_rate: 0.1                 # Fraction of top programs to migrate (0.1 = 10%)
-  island_inspiration_ratio: 0.0       # Portion of inspirations drawn from the current island
+  island_inspiration_ratio: 0.0       # Portion of inspirations drawn from the current island (1.0 = island only)
+
 
   # Selection parameters
   elite_selection_ratio: 0.1          # Ratio of elite programs to select

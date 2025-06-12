@@ -101,6 +101,7 @@ class TestProgramDatabase(unittest.TestCase):
         parent, inspirations = db.sample()
 
         self.assertTrue(all(prog.metadata.get("island") == 0 for prog in inspirations))
+        self.assertEqual(len(inspirations), 2)
 
 
 if __name__ == "__main__":

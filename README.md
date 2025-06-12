@@ -176,7 +176,7 @@ llm:
 database:
   population_size: 500
   num_islands: 5
-  island_inspiration_ratio: 0.0
+  island_inspiration_ratio: 0.0  # 1.0 restricts inspirations to the current island
 ```
 
 Sample configuration files are available in the `configs/` directory:

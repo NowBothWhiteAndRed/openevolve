@@ -641,7 +641,26 @@ class ProgramDatabase:
         Returns:
             List of inspiration programs
         """
-        inspirations = []
+        inspirations: List[Program] = []
+
+        island_ratio = getattr(self.config, "island_inspiration_ratio", 0.0)
+        parent_island = parent.metadata.get("island", self.current_island)
+        island_pool = [
+            pid for pid in self.islands[parent_island] if pid in self.programs and pid != parent.id
+        ]
+
+        if island_ratio >= 1.0:
+            if island_pool:
+                sample_ids = random.sample(island_pool, min(n, len(island_pool)))
+                return [self.programs[pid] for pid in sample_ids]
+            return []
+
+        island_samples = int(n * island_ratio)
+        if island_samples > 0 and island_pool:
+            sample_ids = random.sample(island_pool, min(island_samples, len(island_pool)))
+            inspirations.extend(self.programs[pid] for pid in sample_ids)
+
+        remaining_slots = n - len(inspirations)
 
         # Optionally sample a portion of inspirations from the parent's island
         island_ratio = getattr(self.config, "island_inspiration_ratio", 0.0)
