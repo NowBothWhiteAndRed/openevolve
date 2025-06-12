@@ -166,6 +166,7 @@ class DatabaseConfig:
         0.0  # Fraction of inspirations from the current island (1.0 = island only)
     )
 
+
     # Random seed for reproducible sampling
     random_seed: Optional[int] = None
 
