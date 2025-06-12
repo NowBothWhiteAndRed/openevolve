@@ -641,25 +641,52 @@ class ProgramDatabase:
         Returns:
             List of inspiration programs
         """
-        inspirations = []
+        inspirations: List[Program] = []
+
+        island_ratio = getattr(self.config, "island_inspiration_ratio", 0.0)
+        parent_island = parent.metadata.get("island", self.current_island)
+        island_pool = [
+            pid for pid in self.islands[parent_island] if pid in self.programs and pid != parent.id
+        ]
+
+        if island_ratio >= 1.0:
+            if island_pool:
+                sample_ids = random.sample(island_pool, min(n, len(island_pool)))
+                return [self.programs[pid] for pid in sample_ids]
+            return []
+
+        island_samples = int(n * island_ratio)
+        if island_samples > 0 and island_pool:
+            sample_ids = random.sample(island_pool, min(island_samples, len(island_pool)))
+            inspirations.extend(self.programs[pid] for pid in sample_ids)
+
+        remaining_slots = n - len(inspirations)
 
         # Always include the absolute best program if available and different from parent
-        if self.best_program_id is not None and self.best_program_id != parent.id:
+        if (
+            remaining_slots > 0
+            and self.best_program_id is not None
+            and self.best_program_id != parent.id
+            and self.best_program_id not in [p.id for p in inspirations]
+        ):
             best_program = self.programs[self.best_program_id]
             inspirations.append(best_program)
+            remaining_slots -= 1
             logger.debug(f"Including best program {self.best_program_id} in inspirations")
 
         # Add top programs as inspirations
-        top_n = max(1, int(n * self.config.elite_selection_ratio))
-        top_programs = self.get_top_programs(n=top_n)
-        for program in top_programs:
-            if program.id not in [p.id for p in inspirations] and program.id != parent.id:
-                inspirations.append(program)
+        if remaining_slots > 0:
+            top_n = max(1, int(n * self.config.elite_selection_ratio))
+            top_programs = self.get_top_programs(n=top_n)
+            for program in top_programs:
+                if remaining_slots <= 0:
+                    break
+                if program.id not in [p.id for p in inspirations] and program.id != parent.id:
+                    inspirations.append(program)
+                    remaining_slots -= 1
 
         # Add diverse programs using config.num_diverse_programs
-        if len(self.programs) > n and len(inspirations) < n:
-            # Calculate how many diverse programs to add (up to remaining slots)
-            remaining_slots = n - len(inspirations)
+        if len(self.programs) > n and remaining_slots > 0:
 
             # Sample from different feature cells for diversity
             feature_coords = self._calculate_feature_coords(parent)
@@ -697,6 +724,7 @@ class ProgramDatabase:
                     nearby_programs.extend(random_programs)
 
             inspirations.extend(nearby_programs)
+            remaining_slots = n - len(inspirations)
 
         return inspirations[:n]
 
