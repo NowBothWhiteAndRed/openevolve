@@ -33,6 +33,7 @@ export function showSidebarContent(d, fromHover = false) {
     let tabNames = [];
     if (d.code && typeof d.code === 'string' && d.code.trim() !== '') tabNames.push('Code');
     if (d.prompts && typeof d.prompts === 'object' && Object.keys(d.prompts).length > 0) tabNames.push('Prompts');
+    if (d.llm_output && typeof d.llm_output === 'string' && d.llm_output.trim() !== '') tabNames.push('Output');
     const children = allNodeData.filter(n => n.parent_id === d.id);
     if (children.length > 0) tabNames.push('Children');
     let activeTab = lastSidebarTab && tabNames.includes(lastSidebarTab) ? lastSidebarTab : tabNames[0];
@@ -48,6 +49,9 @@ export function showSidebarContent(d, fromHover = false) {
                 html += `<div style="margin-bottom:0.7em;"><b>${k}:</b><pre class="sidebar-pre">${v}</pre></div>`;
             }
             return html;
+        }
+        if (tabName === 'Output') {
+            return `<pre class="sidebar-pre">${d.llm_output}</pre>`;
         }
         if (tabName === 'Children') {
             const metric = (document.getElementById('metric-select') && document.getElementById('metric-select').value) || 'combined_score';
@@ -89,6 +93,7 @@ export function showSidebarContent(d, fromHover = false) {
             <b>Program ID:</b> ${d.id}<br>
             <b>Island:</b> ${d.island}<br>
             <b>Generation:</b> ${d.generation}<br>
+            <b>Model:</b> ${d.model || 'unknown'}<br>
             <b>Parent ID:</b> <a href="#" class="parent-link" data-parent="${d.parent_id || ''}">${d.parent_id || 'None'}</a>${parentIslandHtml}<br><br>
             <b>Metrics:</b><br>${formatMetrics(d.metrics)}<br><br>
             ${tabHtml}${tabContentHtml}
