@@ -43,7 +43,18 @@ def load_evolution_data(checkpoint_folder):
             if os.path.exists(prog_path):
                 with open(prog_path) as pf:
                     prog = json.load(pf)
+
                 prog["island"] = island_idx
+
+                # Extract metadata fields that are useful for the UI
+                meta_fields = prog.get("metadata", {}) if isinstance(prog.get("metadata"), dict) else {}
+                if "prompts" in meta_fields and isinstance(meta_fields["prompts"], dict):
+                    prog["prompts"] = meta_fields["prompts"]
+                if "llm_output" in meta_fields:
+                    prog["llm_output"] = meta_fields["llm_output"]
+                if "model" in meta_fields:
+                    prog["model"] = meta_fields["model"]
+
                 nodes.append(prog)
                 id_to_program[pid] = prog
             else:
@@ -95,7 +106,13 @@ def program_page(program_id):
 
     data = load_evolution_data(checkpoint_dir)
     program_data = next((p for p in data["nodes"] if p["id"] == program_id), None)
-    program_data = {"code": "", "prompts": {}, **program_data}
+    program_data = {
+        "code": "",
+        "prompts": {},
+        "llm_output": "",
+        "model": "",
+        **program_data,
+    }
 
     return render_template(
         "program_page.html", program_data=program_data, checkpoint_dir=checkpoint_dir

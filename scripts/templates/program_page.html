@@ -15,6 +15,7 @@
         <li><strong>Island:</strong> {{ program_data.island }}</li>
         <li><strong>Generation:</strong> {{ program_data.generation }}</li>
         <li><strong>Parent ID:</strong> {{ program_data.parent_id or 'None' }}</li>
+        <li><strong>Model:</strong> {{ program_data.model or 'Unknown' }}</li>
         <li><strong>Metrics:</strong>
             <ul>
                 {% for key, value in program_data.metrics.items() %}
@@ -31,5 +32,9 @@
             <li><strong>{{ key }}:</strong> <pre style="white-space: pre-wrap; word-break: break-word;">{{ value }}</pre></li>
         {% endfor %}
     </ul>
+    {% if program_data.llm_output %}
+    <h2>LLM Output:</h2>
+    <pre style="white-space: pre-wrap; word-break: break-word;">{{ program_data.llm_output }}</pre>
+    {% endif %}
 </body>
 </html>
